@@ -1,14 +1,11 @@
 package com.goexpress;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,72 +16,24 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class PlaceOrder extends AppCompatActivity {
-
-    EditText name,number,company,country,pincode,address,num_boxes,vol_wt,pay_type,note;
-
-    SharedPreferences LOGIN;
-    int uid;
-
-    Button submit;
+public class ViewOrderActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_place_order);
-
-        LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
-        uid = LOGIN.getInt("uid",0);
-
-
-        name = findViewById(R.id.name);
-        number = findViewById(R.id.number);
-        company = findViewById(R.id.company);
-        country = findViewById(R.id.country);
-        pincode = findViewById(R.id.pincode);
-        address = findViewById(R.id.address);
-        num_boxes = findViewById(R.id.num_boxes);
-        vol_wt = findViewById(R.id.vol_wt);
-        pay_type = findViewById(R.id.pay_type);
-        note = findViewById(R.id.note);
-
-        submit = findViewById(R.id.submit);
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject data = new JSONObject();
-                try {
-                    data.put("name_to",name.getText().toString());
-                    data.put("contact_to",number.getText().toString());
-                    data.put("company_to",company.getText().toString());
-                    data.put("con_country",country.getText().toString());
-                    data.put("con_pincode",pincode.getText().toString());
-                    data.put("con_address1",address.getText().toString());
-                    data.put("num_boxes",num_boxes.getText().toString());
-                    data.put("vol_weight",vol_wt.getText().toString());
-                    data.put("pay_type",pay_type.getText().toString());
-                    data.put("note",note.getText().toString());
-
-
-                    new ApiSubmit().execute(data.toString());
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
+        setContentView(R.layout.activity_view_order);
     }
 
-    public class ApiSubmit extends AsyncTask<String, String, String> {
 
-        ProgressDialog progress = new ProgressDialog(PlaceOrder.this);
+    @SuppressLint("StaticFieldLeak")
+    public class ApiLogin extends AsyncTask<String, String, String> {
+
+        ProgressDialog progress = new ProgressDialog(ViewOrderActivity.this);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progress.setMessage("Sending Data...\nPlease wait");
+            progress.setMessage("Checking...\nPlease wait");
             progress.setCancelable(false);
             progress.show();
         }
@@ -97,7 +46,7 @@ public class PlaceOrder extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                java.net.URL url = new URL(new GlobalUrl().LINK+"book_order.php");
+                java.net.URL url = new URL(new GlobalUrl().LINK+"getsingleorderdetails.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 // is output buffer writter
@@ -149,32 +98,28 @@ public class PlaceOrder extends AppCompatActivity {
             return JsonResponse;
         }
 
+        @SuppressLint("ApplySharedPref")
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Log.d("ResponseJson", "Reached" + s);
-
-            progress.dismiss();
+            Log.d("Login", " - " + s);
 
             if (s != null) {
                 try {
                     JSONObject jsonObject = new JSONObject(s);
                     if(jsonObject.getString("statusCode").equals("01"))
                     {
-                        //addNotification("Success","Order has been sent to admin");
-                        Intent it = new Intent(getApplicationContext(),OrderCompleted.class);
-                        it.putExtra("key",1);
-                        it.putExtra("order_id",jsonObject.getString("order_id"));
-                        it.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(it);
-                        finishAffinity();
+
+                    }
+                    else
+                    {
+                        Toast.makeText(ViewOrderActivity.this, "Wrong username or password.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             } else
-                Toast.makeText(PlaceOrder.this, "Connection Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewOrderActivity.this, "Connection Error", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

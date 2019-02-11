@@ -2,6 +2,6 @@ package com.goexpress;
 
 public class GlobalUrl {
 
-    public String LINK = "http://valkalam.com/pace/";
+    public String LINK = "http://goexp.tech/demo/api/";
 
 }

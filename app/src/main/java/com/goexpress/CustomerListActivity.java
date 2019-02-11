@@ -3,7 +3,6 @@ package com.goexpress;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,25 +26,22 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class OrdersActivity extends AppCompatActivity {
+public class CustomerListActivity extends AppCompatActivity {
 
     SharedPreferences LOGIN;
     int uid;
     ArrayList<OrderLogs> orderLogsList;
     ListView listView;
 
-    FloatingActionButton fab;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_orders);
+        setContentView(R.layout.activity_customer_list);
 
         LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
         uid = LOGIN.getInt("uid",0);
         orderLogsList = new ArrayList<>();
         listView = findViewById(R.id.listView);
-        fab = findViewById(R.id.fab);
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -56,22 +51,13 @@ public class OrdersActivity extends AppCompatActivity {
         }
 
         new ApiGetLogs().execute(jsonObject.toString());
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(OrdersActivity.this,PlaceOrder.class));
-            }
-        });
-
     }
-
 
 
 
     public class ApiGetLogs extends AsyncTask<String, String, String> {
 
-        ProgressDialog progress = new ProgressDialog(OrdersActivity.this);
+        ProgressDialog progress = new ProgressDialog(CustomerListActivity.this);
 
         @Override
         protected void onPreExecute() {
@@ -89,7 +75,7 @@ public class OrdersActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                java.net.URL url = new URL(new GlobalUrl().LINK+"vieworderdata.php");
+                java.net.URL url = new URL(new GlobalUrl().LINK+"get_users_lists.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 // is output buffer writter
@@ -157,11 +143,11 @@ public class OrdersActivity extends AppCompatActivity {
                         OrderLogs orderLogs = new OrderLogs();
                         orderLogs.setOrder_id(jsonArray.getJSONObject(i).getString("OrderId"));
                         orderLogs.setDate(getDatetoLocal(jsonArray.getJSONObject(i).getString("created_at")));
-                        orderLogs.setOrder_by(jsonArray.getJSONObject(i).getString("order_placed_by"));
+                        orderLogs.setAwb(jsonArray.getJSONObject(i).getString("awb_no"));
                         orderLogsList.add(orderLogs);
                     }
 
-                    ConfirmationAdapter adapter = new ConfirmationAdapter(OrdersActivity.this,R.layout.order_item, orderLogsList);
+                    ConfirmationAdapter adapter = new ConfirmationAdapter(CustomerListActivity.this,R.layout.order_item, orderLogsList);
                     listView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
 
@@ -169,7 +155,7 @@ public class OrdersActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             } else
-                Toast.makeText(OrdersActivity.this, "Connection Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CustomerListActivity.this, "Connection Error", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -210,14 +196,14 @@ public class OrdersActivity extends AppCompatActivity {
 
                 v.setTag(holder);
             } else {
-                holder = (ViewHolder) v.getTag();
+                holder = (ConfirmationAdapter.ViewHolder) v.getTag();
             }
 
             holder.order_date.setText(postList.get(position).getDate());
 
             holder.order_no.setText(postList.get(position).getOrder_id());
 
-            if (!postList.get(position).getOrder_by().equals("")) {
+            if (!postList.get(position).getAwb().equals("")) {
                 holder.indicator.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
             }
 
@@ -251,14 +237,14 @@ public class OrdersActivity extends AppCompatActivity {
     {
         String order_id;
 
-        String order_by;
+        String awb;
 
-        public String getOrder_by() {
-            return order_by;
+        public String getAwb() {
+            return awb;
         }
 
-        public void setOrder_by(String order_by) {
-            this.order_by = order_by;
+        public void setAwb(String awb) {
+            this.awb = awb;
         }
 
         public String getOrder_id() {
@@ -299,4 +285,5 @@ public class OrdersActivity extends AppCompatActivity {
 
         return formattedDate;
     }
+
 }

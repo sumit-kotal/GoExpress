@@ -79,14 +79,14 @@ public class LoginActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     public class ApiLogin extends AsyncTask<String, String, String> {
 
-        ProgressDialog progress = new ProgressDialog(LoginActivity.this);
+        //ProgressDialog progress = new ProgressDialog(getApplicationContext());
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progress.setMessage("Checking...\nPlease wait");
+            /*progress.setMessage("Checking...\nPlease wait");
             progress.setCancelable(false);
-            progress.show();
+            progress.show();*/
         }
 
         @Override
@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                java.net.URL url = new URL(new GlobalUrl().LINK+"pace/api/login.php");
+                java.net.URL url = new URL(new GlobalUrl().LINK+"login.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 // is output buffer writter
@@ -160,8 +160,6 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(s);
                     if(jsonObject.getString("statusCode").equals("01"))
                     {
-                        String role = jsonObject.getString("role").toLowerCase();
-                        if (!role.equals("admin")) {
                             SharedPreferences.Editor editor = LOGIN.edit();
                             editor.putInt("uid", jsonObject.getInt("uid"));
                             editor.putString("name", jsonObject.getString("name"));
@@ -173,9 +171,6 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(new Intent(getApplicationContext(), OrdersActivity.class));
                             finish();
                         }
-                        else
-                            Toast.makeText(LoginActivity.this, "You are not authorized to login into this application", Toast.LENGTH_SHORT).show();
-                    }
                     else
                     {
                         Toast.makeText(LoginActivity.this, "Wrong username or password.\nPlease try again", Toast.LENGTH_SHORT).show();
