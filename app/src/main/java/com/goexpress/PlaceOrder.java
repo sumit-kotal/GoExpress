@@ -23,8 +23,7 @@ public class PlaceOrder extends AppCompatActivity {
 
     EditText name,number,company,country,pincode,address,num_boxes,vol_wt,pay_type,note;
 
-    SharedPreferences LOGIN;
-    int uid;
+    String uid;
 
     Button submit;
 
@@ -33,8 +32,7 @@ public class PlaceOrder extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_order);
 
-        LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
-        uid = LOGIN.getInt("uid",0);
+        uid = getIntent().getStringExtra("uid");
 
 
         name = findViewById(R.id.name);

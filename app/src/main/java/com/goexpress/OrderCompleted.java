@@ -38,7 +38,7 @@ public class OrderCompleted extends AppCompatActivity {
         relative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(OrderCompleted.this,OrdersActivity.class).putExtra("order_id",ORDER_ID));
+                startActivity(new Intent(OrderCompleted.this,ViewOrderActivity.class).putExtra("order_id",ORDER_ID));
             }
         });
 

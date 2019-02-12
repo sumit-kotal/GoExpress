@@ -3,6 +3,7 @@ package com.goexpress;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -75,7 +76,7 @@ public class CustomerListActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                java.net.URL url = new URL(new GlobalUrl().LINK+"get_users_lists.php");
+                java.net.URL url = new URL(new GlobalUrl().LINK+"get_user_lists.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 // is output buffer writter
@@ -141,9 +142,8 @@ public class CustomerListActivity extends AppCompatActivity {
                     for(int i=0;i<jsonArray.length();i++)
                     {
                         OrderLogs orderLogs = new OrderLogs();
-                        orderLogs.setOrder_id(jsonArray.getJSONObject(i).getString("OrderId"));
-                        orderLogs.setDate(getDatetoLocal(jsonArray.getJSONObject(i).getString("created_at")));
-                        orderLogs.setAwb(jsonArray.getJSONObject(i).getString("awb_no"));
+                        orderLogs.setOrder_id(jsonArray.getJSONObject(i).getString("name"));
+                        orderLogs.setUid(jsonArray.getJSONObject(i).getString("uid"));
                         orderLogsList.add(orderLogs);
                     }
 
@@ -199,24 +199,21 @@ public class CustomerListActivity extends AppCompatActivity {
                 holder = (ConfirmationAdapter.ViewHolder) v.getTag();
             }
 
-            holder.order_date.setText(postList.get(position).getDate());
+            holder.order_date.setVisibility(View.GONE);
 
             holder.order_no.setText(postList.get(position).getOrder_id());
 
-            if (!postList.get(position).getAwb().equals("")) {
-                holder.indicator.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
-            }
-
             //
+
+            holder.details.setText("Place Order");
 
             holder.details.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                   /* Intent it = new Intent(OrdersActivity.this,OrderDetails.class);
-                    it.putExtra("order_id",postList.get(position).getOrder_id());
-                    it.putExtra("key","orders");
-                    startActivity(it);*/
+                    Intent it = new Intent(CustomerListActivity.this,PlaceOrder.class);
+                    it.putExtra("uid",postList.get(position).getUid());
+                    startActivity(it);
 
                 }
             });
@@ -237,14 +234,14 @@ public class CustomerListActivity extends AppCompatActivity {
     {
         String order_id;
 
-        String awb;
+        String uid;
 
-        public String getAwb() {
-            return awb;
+        public String getUid() {
+            return uid;
         }
 
-        public void setAwb(String awb) {
-            this.awb = awb;
+        public void setUid(String uid) {
+            this.uid = uid;
         }
 
         public String getOrder_id() {
@@ -255,15 +252,6 @@ public class CustomerListActivity extends AppCompatActivity {
             this.order_id = order_id;
         }
 
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        String date;
     }
 
     public String getDatetoLocal(String dt){

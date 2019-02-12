@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,10 +19,29 @@ import java.net.URL;
 
 public class ViewOrderActivity extends AppCompatActivity {
 
+    String order_id;
+
+    TextView test;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_order);
+
+        test = findViewById(R.id.text);
+
+        order_id = getIntent().getStringExtra("order_id");
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("order_id",order_id);
+
+            new ApiLogin().execute(jsonObject.toString());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -104,17 +124,22 @@ public class ViewOrderActivity extends AppCompatActivity {
             super.onPostExecute(s);
             Log.d("Login", " - " + s);
 
+            progress.dismiss();
+
             if (s != null) {
                 try {
                     JSONObject jsonObject = new JSONObject(s);
-                    if(jsonObject.getString("statusCode").equals("01"))
+
+                    test.setText(jsonObject.toString());
+
+                   /* if(jsonObject.getString("statusCode").equals("01"))
                     {
 
                     }
                     else
                     {
                         Toast.makeText(ViewOrderActivity.this, "Wrong username or password.\nPlease try again", Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

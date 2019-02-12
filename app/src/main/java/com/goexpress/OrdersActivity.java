@@ -60,7 +60,7 @@ public class OrdersActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(OrdersActivity.this,PlaceOrder.class));
+                startActivity(new Intent(OrdersActivity.this,CustomerListActivity.class));
             }
         });
 
@@ -227,10 +227,9 @@ public class OrdersActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                   /* Intent it = new Intent(OrdersActivity.this,OrderDetails.class);
+                    Intent it = new Intent(OrdersActivity.this,ViewOrderActivity.class);
                     it.putExtra("order_id",postList.get(position).getOrder_id());
-                    it.putExtra("key","orders");
-                    startActivity(it);*/
+                    startActivity(it);
 
                 }
             });
