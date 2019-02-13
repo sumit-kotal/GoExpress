@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ public class PlaceOrder extends AppCompatActivity {
 
     String uid;
 
-    Button submit;
+    ImageView submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

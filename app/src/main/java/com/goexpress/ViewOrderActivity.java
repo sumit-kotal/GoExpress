@@ -21,14 +21,11 @@ public class ViewOrderActivity extends AppCompatActivity {
 
     String order_id;
 
-    TextView test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_order);
-
-        test = findViewById(R.id.text);
 
         order_id = getIntent().getStringExtra("order_id");
 
@@ -130,16 +127,29 @@ public class ViewOrderActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(s);
 
-                    test.setText(jsonObject.toString());
-
-                   /* if(jsonObject.getString("statusCode").equals("01"))
+                    if(jsonObject.getString("statusCode").equals("01"))
                     {
+
+                        cust_name.text = jsonObject.getString("consignor_name")
+                        awb.text = jsonObject.getString("awb_no")
+                        payment.text = jsonObject.getString("pay_type")
+
+
+                        name.text = jsonObject.getString("name_to")
+                        number.text = jsonObject.getString("contact_to")
+                        company.text = jsonObject.getString("company_to")
+
+                        country.text = jsonObject.getString("con_country")
+                        pincode.text = jsonObject.getString("con_pincode")
+                        address.text = jsonObject.getString("con_address1")
+
+                        note.text = jsonObject.getString("note")
 
                     }
                     else
                     {
-                        Toast.makeText(ViewOrderActivity.this, "Wrong username or password.\nPlease try again", Toast.LENGTH_SHORT).show();
-                    }*/
+                        Toast.makeText(ViewOrderActivity.this, "Please try again", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -17,6 +17,32 @@
         android:orientation="vertical"
         tools:context=".PlaceOrder">
 
+    <RelativeLayout
+            android:background="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+        <TextView
+                android:text="Consignee"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <ImageView
+                android:id="@+id/submit"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_checked"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+
+    </RelativeLayout>
+
+
     <EditText
             android:id="@+id/name"
             android:hint="Name"
@@ -32,13 +58,13 @@
 
     <EditText
             android:id="@+id/company"
-            android:hint="Company"
+            android:hint="Company name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
     <EditText
             android:id="@+id/country"
-            android:hint="Name"
+            android:hint="Country"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -82,20 +108,12 @@
             android:background="@drawable/textinputborder"
             android:maxLines="5"
             android:lines="5"
-            android:hint="Destination Address"
+            android:hint="Note"
             android:gravity="top"
             android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-
-    <Button
-            android:id="@+id/submit"
-            android:text="Submit"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
 </LinearLayout>
 </ScrollView>

@@ -14,7 +14,7 @@
 
         <ImageView
             android:id="@+id/image"
-            app:srcCompat="@drawable/ic_checked"
+            android:src="@drawable/ic_checked"
             android:layout_centerInParent="true"
             android:layout_width="50dp"
             android:layout_height="50dp" />
