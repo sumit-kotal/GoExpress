@@ -1,16 +1,17 @@
 package com.goexpress;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import org.json.JSONException;
@@ -22,18 +23,34 @@ import java.net.URL;
 
 public class PlaceOrder extends AppCompatActivity {
 
-    EditText name,number,company,country,pincode,address,num_boxes,vol_wt,pay_type,note;
+    EditText name,number,company,address,pincode,num_boxes,vol_wt,note;
 
-    String uid;
+    AutoCompleteTextView country;
+    Spinner pay_type;
+
+    String selectedCountry = "",selectedPayment = "";
+
+    int uid;
+    JSONObject dataReceived;
 
     ImageView submit;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_order);
 
-        uid = getIntent().getStringExtra("uid");
+        SharedPreferences LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
+        uid = LOGIN.getInt("uid",0);
+
+        try {
+            dataReceived = new JSONObject(getIntent().getStringExtra("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("Data received ",dataReceived.toString());
 
 
         name = findViewById(R.id.name);
@@ -47,23 +64,55 @@ public class PlaceOrder extends AppCompatActivity {
         pay_type = findViewById(R.id.pay_type);
         note = findViewById(R.id.note);
 
+        String[] countries =getResources().getStringArray(R.array.countries);
+        ArrayAdapter autocompletetextAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_dropdown_item_1line, countries);
+
+        country.setAdapter(autocompletetextAdapter);
+
+        country.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d("selectedCountry++",adapterView.getItemAtPosition(i).toString());
+                selectedCountry = adapterView.getItemAtPosition(i).toString();
+            }
+        });
+
+
+
         submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JSONObject data = new JSONObject();
+                selectedPayment = pay_type.getSelectedItem().toString();
                 try {
-                    data.put("name_to",name.getText().toString());
-                    data.put("contact_to",number.getText().toString());
-                    data.put("company_to",company.getText().toString());
-                    data.put("con_country",country.getText().toString());
-                    data.put("con_pincode",pincode.getText().toString());
-                    data.put("con_address1",address.getText().toString());
-                    data.put("num_boxes",num_boxes.getText().toString());
-                    data.put("vol_weight",vol_wt.getText().toString());
-                    data.put("pay_type",pay_type.getText().toString());
+                    data.put("uid",uid);
+                    data.put("consignee_name",name.getText().toString());
+                    data.put("consignee_contact",number.getText().toString());
+                    data.put("consignee_company",company.getText().toString());
+                    data.put("consignee_country",selectedCountry);
+                    data.put("consignee_pincode",pincode.getText().toString());
+                    data.put("consignee_addr",address.getText().toString());
+                    data.put("nobox",num_boxes.getText().toString());
+                    data.put("weight",vol_wt.getText().toString());
+                    data.put("pay_type",selectedPayment);
                     data.put("note",note.getText().toString());
+                    data.put("customer_id",dataReceived.getString("uid"));
 
+                    if (dataReceived.has("city")) data.put("cust_city",dataReceived.getString("city"));
+                    if (dataReceived.has("state")) data.put("cust_state",dataReceived.getString("state"));
+                    if (dataReceived.has("country")) data.put("cust_country",dataReceived.getString("country"));
+                    if (dataReceived.has("name")) data.put("cust_name",dataReceived.getString("name"));
+                    if (dataReceived.has("company")) data.put("cust_company",dataReceived.getString("company"));
+                    if (dataReceived.has("phone")) data.put("cust_contact",dataReceived.getString("phone"));
+                    if (dataReceived.has("email")) data.put("cust_email",dataReceived.getString("email"));
+                    if (dataReceived.has("address_line1")) data.put("cust_addr",dataReceived.getString("address_line1"));
+                    if (dataReceived.has("pincode")) data.put("$cust_pincode",dataReceived.getString("pincode"));
+
+
+                    Log.d("Printing Data ",data.toString());
 
                     new ApiSubmit().execute(data.toString());
 

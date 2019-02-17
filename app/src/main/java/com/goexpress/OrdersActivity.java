@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +40,8 @@ public class OrdersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
 
+        setTitle("AWB List");
+
         LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
         uid = LOGIN.getInt("uid",0);
         orderLogsList = new ArrayList<>();
@@ -64,6 +64,31 @@ public class OrdersActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        // return true so that the menu pop up is opened
+        return true;
+    }
+
+    @SuppressLint("ApplySharedPref")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // display a message when a button was pressed
+        if (item.getItemId() == R.id.logout) {
+            SharedPreferences.Editor editor = LOGIN.edit();
+            editor.clear();
+            editor.commit();
+            Intent it = new Intent(OrdersActivity.this,LoginActivity.class);
+            it.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(it);
+
+        }
+        return true;
     }
 
 
@@ -89,7 +114,7 @@ public class OrdersActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                java.net.URL url = new URL(new GlobalUrl().LINK+"vieworderdata.php");
+                java.net.URL url = new URL(new GlobalUrl().LINK+"getorderbyuser.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
                 // is output buffer writter
@@ -156,8 +181,8 @@ public class OrdersActivity extends AppCompatActivity {
                     {
                         OrderLogs orderLogs = new OrderLogs();
                         orderLogs.setOrder_id(jsonArray.getJSONObject(i).getString("OrderId"));
+                        orderLogs.setAwb_no(jsonArray.getJSONObject(i).getString("awb_no"));
                         orderLogs.setDate(getDatetoLocal(jsonArray.getJSONObject(i).getString("created_at")));
-                        orderLogs.setOrder_by(jsonArray.getJSONObject(i).getString("order_placed_by"));
                         orderLogsList.add(orderLogs);
                     }
 
@@ -215,11 +240,11 @@ public class OrdersActivity extends AppCompatActivity {
 
             holder.order_date.setText(postList.get(position).getDate());
 
-            holder.order_no.setText(postList.get(position).getOrder_id());
+            holder.order_no.setText(postList.get(position).getAwb_no());
 
-            if (!postList.get(position).getOrder_by().equals("")) {
-                holder.indicator.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
-            }
+           // holder.order_no.setText(postList.get(position).getOrder_id());
+
+
 
             //
 
@@ -250,14 +275,15 @@ public class OrdersActivity extends AppCompatActivity {
     {
         String order_id;
 
-        String order_by;
 
-        public String getOrder_by() {
-            return order_by;
+        String awb_no;
+
+        public String getAwb_no() {
+            return awb_no;
         }
 
-        public void setOrder_by(String order_by) {
-            this.order_by = order_by;
+        public void setAwb_no(String awb_no) {
+            this.awb_no = awb_no;
         }
 
         public String getOrder_id() {

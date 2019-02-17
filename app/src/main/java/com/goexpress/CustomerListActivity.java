@@ -39,6 +39,8 @@ public class CustomerListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_list);
 
+        setTitle("Select Customer");
+
         LOGIN = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
         uid = LOGIN.getInt("uid",0);
         orderLogsList = new ArrayList<>();
@@ -211,9 +213,18 @@ public class CustomerListActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    Intent it = new Intent(CustomerListActivity.this,PlaceOrder.class);
-                    it.putExtra("uid",postList.get(position).getUid());
-                    startActivity(it);
+                    /*Intent it = new Intent(CustomerListActivity.this,PlaceOrder.class);
+                    it.putExtra("cuid",postList.get(position).getUid());
+                    startActivity(it);*/
+
+                    JSONObject j = new JSONObject();
+                    try {
+                        j.put("uid",postList.get(position).getUid());
+                        new ApiGetUserInfo().execute(j.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
 
                 }
             });
@@ -254,24 +265,103 @@ public class CustomerListActivity extends AppCompatActivity {
 
     }
 
-    public String getDatetoLocal(String dt){
+    public class ApiGetUserInfo extends AsyncTask<String, String, String> {
 
-        String formattedDate = null;
-        try {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = df.parse(dt);
-            df.setTimeZone(TimeZone.getDefault());
-            formattedDate = df.format(date);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+        ProgressDialog progress = new ProgressDialog(CustomerListActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progress.setMessage("Fetching Data...\nPlease wait");
+            progress.setCancelable(false);
+            progress.show();
         }
 
-        Log.d("Formatted Date",formattedDate);
+        @Override
+        protected String doInBackground(String... params) {
+            String JsonResponse = null;
+            String JsonDATA = params[0];
 
-        return formattedDate;
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            try {
+                java.net.URL url = new URL(new GlobalUrl().LINK+"get_user_info.php");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setDoOutput(true);
+                // is output buffer writter
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Accept", "application/json");
+//set headers and method
+                Writer writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "UTF-8"));
+                writer.write(JsonDATA);
+// json data
+                writer.close();
+                InputStream inputStream = urlConnection.getInputStream();
+//input stream
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String inputLine;
+                while ((inputLine = reader.readLine()) != null)
+                    buffer.append(inputLine + "\n");
+                if (buffer.length() == 0) {
+                    // Stream was empty. No point in parsing.
+                    return null;
+                }
+                JsonResponse = buffer.toString();
+
+//response data
+
+                return JsonResponse;
+
+
+            } catch (IOException /*| JSONException*/ e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return JsonResponse;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("GetUser", "Reached" + s);
+
+            progress.dismiss();
+
+            if (s != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(s);
+
+                    JSONObject data = jsonObject.getJSONArray("data").getJSONObject(0);
+
+                    Intent it = new Intent(CustomerListActivity.this,PlaceOrder.class);
+                    it.putExtra("data",data.toString());
+                    startActivity(it);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else
+                Toast.makeText(CustomerListActivity.this, "Connection Error", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
 }
