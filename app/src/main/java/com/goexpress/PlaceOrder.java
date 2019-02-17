@@ -100,7 +100,6 @@ public class PlaceOrder extends AppCompatActivity {
                     data.put("pay_type",selectedPayment);
                     data.put("note",note.getText().toString());
                     data.put("customer_id",dataReceived.getString("uid"));
-
                     if (dataReceived.has("city")) data.put("cust_city",dataReceived.getString("city"));
                     if (dataReceived.has("state")) data.put("cust_state",dataReceived.getString("state"));
                     if (dataReceived.has("country")) data.put("cust_country",dataReceived.getString("country"));
